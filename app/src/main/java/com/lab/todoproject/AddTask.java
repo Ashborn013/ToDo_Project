@@ -1,10 +1,9 @@
 package com.lab.todoproject;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,28 +13,24 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import java.util.Calendar;
 
-
 public class AddTask extends AppCompatActivity {
+
     private EditText etTaskName, etTaskDesc;
     private TextView tvDeadline;
     private Button btnPickDeadline, btnSubmit;
     private String deadline;
-
     private DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_task);
 
         etTaskName = findViewById(R.id.et_task_name);
@@ -45,8 +40,6 @@ public class AddTask extends AppCompatActivity {
         btnSubmit = findViewById(R.id.btn_submit);
 
         databaseHelper = new DatabaseHelper(this);
-
-
 
         btnPickDeadline.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,11 +52,10 @@ public class AddTask extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 saveTask();
-
             }
         });
-
     }
+
     private void pickDateTime() {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -80,6 +72,7 @@ public class AddTask extends AppCompatActivity {
 
         datePickerDialog.show();
     }
+
     private void pickTime(Calendar calendar) {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
@@ -91,11 +84,17 @@ public class AddTask extends AppCompatActivity {
                 calendar.set(Calendar.MINUTE, minute);
                 deadline = calendar.getTime().toString();
                 tvDeadline.setText(deadline);
+
+                // Save the task after picking the deadline
+                saveTask();
+                // Schedule the notification
+                scheduleNotification(calendar);
             }
         }, hour, minute, true);
 
         timePickerDialog.show();
     }
+
     private void saveTask() {
         String taskName = etTaskName.getText().toString().trim();
         String taskDesc = etTaskDesc.getText().toString().trim();
@@ -110,10 +109,25 @@ public class AddTask extends AppCompatActivity {
             Toast.makeText(this, "Task Added", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getApplicationContext(), HomeScreen.class));
             finish();
-
         } else {
-            Log.d("AddTask", "Error Adding Task"+taskName+taskDesc+deadline);
+            Log.d("AddTask", "Error Adding Task: " + taskName + taskDesc + deadline);
             Toast.makeText(this, "Error Adding Task", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void scheduleNotification(Calendar calendar) {
+        // Set the time for the notification (1 minute before the task deadline)
+        calendar.add(Calendar.MINUTE, -1);
+
+        Intent notificationIntent = new Intent(this, TaskNotificationReceiver.class);
+        notificationIntent.putExtra("task_name", etTaskName.getText().toString().trim());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            Toast.makeText(this, "Notification Scheduled", Toast.LENGTH_SHORT).show();
         }
     }
 }
