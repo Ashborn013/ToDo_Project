@@ -5,23 +5,17 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Calendar;
 
 public class AddTask extends AppCompatActivity {
-
     private EditText etTaskName, etTaskDesc;
     private TextView tvDeadline;
     private Button btnPickDeadline, btnSubmit;
@@ -41,19 +35,9 @@ public class AddTask extends AppCompatActivity {
 
         databaseHelper = new DatabaseHelper(this);
 
-        btnPickDeadline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pickDateTime();
-            }
-        });
+        btnPickDeadline.setOnClickListener(v -> pickDateTime());
 
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveTask();
-            }
-        });
+        btnSubmit.setOnClickListener(v -> saveTask());
     }
 
     private void pickDateTime() {
@@ -62,12 +46,9 @@ public class AddTask extends AppCompatActivity {
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                calendar.set(year, month, dayOfMonth);
-                pickTime(calendar);
-            }
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year1, month1, dayOfMonth) -> {
+            calendar.set(year1, month1, dayOfMonth);
+            pickTime(calendar);
         }, year, month, day);
 
         datePickerDialog.show();
@@ -77,19 +58,11 @@ public class AddTask extends AppCompatActivity {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                calendar.set(Calendar.MINUTE, minute);
-                deadline = calendar.getTime().toString();
-                tvDeadline.setText(deadline);
-
-                // Save the task after picking the deadline
-                saveTask();
-                // Schedule the notification
-                scheduleNotification(calendar);
-            }
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, (view, hourOfDay, minute1) -> {
+            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            calendar.set(Calendar.MINUTE, minute1);
+            deadline = calendar.getTime().toString();
+            tvDeadline.setText(deadline);
         }, hour, minute, true);
 
         timePickerDialog.show();
@@ -107,27 +80,36 @@ public class AddTask extends AppCompatActivity {
         boolean inserted = databaseHelper.insertTask(taskName, taskDesc, deadline);
         if (inserted) {
             Toast.makeText(this, "Task Added", Toast.LENGTH_SHORT).show();
+
+            // Schedule the notification
+            scheduleTaskNotification(taskName, taskDesc, deadline);
+
             startActivity(new Intent(getApplicationContext(), HomeScreen.class));
             finish();
         } else {
-            Log.d("AddTask", "Error Adding Task: " + taskName + taskDesc + deadline);
             Toast.makeText(this, "Error Adding Task", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void scheduleNotification(Calendar calendar) {
-        // Set the time for the notification (1 minute before the task deadline)
-        calendar.add(Calendar.MINUTE, -1);
+    private void scheduleTaskNotification(String taskName, String taskDesc, String deadline) {
+        // Convert deadline to a Calendar object (Assuming it's in a valid format)
+        Calendar calendar = Calendar.getInstance();
+        // (Parse the deadline into Calendar if needed)
 
-        Intent notificationIntent = new Intent(this, TaskNotificationReceiver.class);
-        notificationIntent.putExtra("task_name", etTaskName.getText().toString().trim());
+        // Set the time to 1 minute before the deadline
+        calendar.add(Calendar.MINUTE, -1); // 1 minute before deadline
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Schedule the notification using AlarmManager
+        long triggerAtMillis = calendar.getTimeInMillis();
 
+        Intent intent = new Intent(this, TaskNotificationReceiver.class);
+        intent.putExtra("task_name", taskName);
+        intent.putExtra("task_description", taskDesc);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         if (alarmManager != null) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-            Toast.makeText(this, "Notification Scheduled", Toast.LENGTH_SHORT).show();
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
         }
     }
 }

@@ -12,7 +12,7 @@ public class TaskNotificationReceiver extends BroadcastReceiver {
         String taskName = intent.getStringExtra("task_name");
         String taskDescription = intent.getStringExtra("task_description");
 
-        // If necessary, provide a fallback message if task details are missing
+        // Provide fallback message if necessary
         if (taskName == null || taskDescription == null) {
             taskName = "Task Reminder";
             taskDescription = "You have a task due soon!";

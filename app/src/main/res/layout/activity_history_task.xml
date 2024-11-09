@@ -10,6 +10,7 @@
 
     <!-- ListView for displaying completed tasks -->
     <ListView
+        android:backgroundTint="#ADD8E6"
         android:id="@+id/lv_completed_tasks"
         android:layout_width="0dp"
         android:layout_height="0dp"

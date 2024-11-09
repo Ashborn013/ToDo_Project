@@ -16,9 +16,7 @@
         >
 
         <!-- Registering the TaskNotificationReceiver -->
-        <receiver android:name=".TaskNotificationReceiver"
-            android:enabled="true"
-            android:exported="false" />
+        <receiver android:name=".TaskNotificationReceiver" android:exported="false" />
 <!--        <receiver android:name=".NotificationReceiver" android:exported="false" />-->
         <!-- Existing Activities -->
         <activity
