@@ -1,5 +1,6 @@
 package com.lab.todoproject;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.app.DatePickerDialog;
@@ -45,6 +46,8 @@ public class AddTask extends AppCompatActivity {
 
         databaseHelper = new DatabaseHelper(this);
 
+
+
         btnPickDeadline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,6 +59,8 @@ public class AddTask extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 saveTask();
+                startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                finish();
             }
         });
 
@@ -104,7 +109,7 @@ public class AddTask extends AppCompatActivity {
         boolean inserted = databaseHelper.insertTask(taskName, taskDesc, deadline);
         if (inserted) {
             Toast.makeText(this, "Task Added", Toast.LENGTH_SHORT).show();
-            finish();
+
         } else {
             Log.d("AddTask", "Error Adding Task"+taskName+taskDesc+deadline);
             Toast.makeText(this, "Error Adding Task", Toast.LENGTH_SHORT).show();
