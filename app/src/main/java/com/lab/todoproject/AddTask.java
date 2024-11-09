@@ -59,8 +59,7 @@ public class AddTask extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 saveTask();
-                startActivity(new Intent(getApplicationContext(), HomeScreen.class));
-                finish();
+
             }
         });
 
@@ -109,6 +108,8 @@ public class AddTask extends AppCompatActivity {
         boolean inserted = databaseHelper.insertTask(taskName, taskDesc, deadline);
         if (inserted) {
             Toast.makeText(this, "Task Added", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+            finish();
 
         } else {
             Log.d("AddTask", "Error Adding Task"+taskName+taskDesc+deadline);

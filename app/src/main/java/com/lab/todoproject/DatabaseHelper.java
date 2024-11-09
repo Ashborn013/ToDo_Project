@@ -34,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_DEADLINE + " TEXT, "
                 + COLUMN_COMPLETED + " INTEGER DEFAULT 0)";
         db.execSQL(createTable);
-        insertSampleData(db);
+//        insertSampleData(db);
     }
 
     private void insertSampleData(SQLiteDatabase db) {

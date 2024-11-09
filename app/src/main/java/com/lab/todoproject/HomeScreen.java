@@ -35,13 +35,13 @@ public class HomeScreen extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         loadTasks();
 
-//        lvTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Task task = taskList.get(position);
-//                markTaskAsComplete(task);
-//            }
-//        });
+        lvTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Task task = taskList.get(position);
+                markTaskAsComplete(task);
+            }
+        });
 
 
 
