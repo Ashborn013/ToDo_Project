@@ -2,10 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#2196F3"
+    android:background="#ADCFE6"
     android:padding="16dp"
     android:layout_marginBottom="8dp">
 
+    <!-- Task Heading -->
     <TextView
         android:id="@+id/tv_task_name"
         android:layout_width="wrap_content"
@@ -14,35 +15,58 @@
         android:textColor="#FFFFFF"
         android:layout_alignParentStart="true" />
 
+    <!-- Task Description below Heading -->
     <TextView
-        android:id="@+id/tv_task_deadline"
+        android:id="@+id/tv_task_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_task_name"
         android:textSize="14sp"
-        android:textColor="#FFFFFF" />
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="4dp" />
 
-    <Button
-        android:id="@+id/btn_mark_complete"
+    <!-- Time Due (Deadline) below Description -->
+    <TextView
+        android:id="@+id/tv_task_deadline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Complete"
-        android:layout_alignParentEnd="true"
-        android:textColor="#FFFFFF" />
+        android:layout_below="@id/tv_task_description"
+        android:textSize="14sp"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="4dp" />
 
-    <Button
-        android:id="@+id/btn_edit"
+    <!-- Horizontal LinearLayout for Buttons -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit"
-        android:layout_toStartOf="@id/btn_mark_complete"
-        android:textColor="#FFFFFF" />
+        android:orientation="horizontal"
+        android:layout_below="@id/tv_task_deadline"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentStart="true">
 
-    <Button
-        android:id="@+id/btn_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Delete"
-        android:layout_toStartOf="@id/btn_edit"
-        android:textColor="#FFFFFF" />
+        <!-- Complete Button -->
+        <Button
+            android:id="@+id/btn_mark_complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Complete"
+            android:textColor="#FFFFFF" />
+
+        <!-- Edit Button -->
+        <Button
+            android:id="@+id/btn_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit"
+            android:textColor="#FFFFFF" />
+
+        <!-- Delete Button -->
+        <Button
+            android:id="@+id/btn_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
 </RelativeLayout>

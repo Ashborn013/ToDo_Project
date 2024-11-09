@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-
 public class TaskAdapter extends BaseAdapter {
 
     private Context context;
@@ -46,7 +45,9 @@ public class TaskAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.task_item, parent, false);
         }
 
+        // Views in task_item.xml
         TextView tvTaskName = convertView.findViewById(R.id.tv_task_name);
+        TextView tvTaskDescription = convertView.findViewById(R.id.tv_task_description); // Added
         TextView tvTaskDeadline = convertView.findViewById(R.id.tv_task_deadline);
         Button btnComplete = convertView.findViewById(R.id.btn_mark_complete);
         Button btnEdit = convertView.findViewById(R.id.btn_edit);
@@ -54,8 +55,10 @@ public class TaskAdapter extends BaseAdapter {
 
         final Task task = tasks.get(position);
         tvTaskName.setText(task.getName());
+        tvTaskDescription.setText(task.getDescription());  // Binding task description
         tvTaskDeadline.setText(task.getDeadline());
 
+        // Mark task as complete
         btnComplete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,16 +69,17 @@ public class TaskAdapter extends BaseAdapter {
             }
         });
 
+        // Edit task
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, EditTaskActivity.class);
                 intent.putExtra("TASK_ID", task.getId());
                 context.startActivity(intent);
-//
             }
         });
 
+        // Delete task
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
