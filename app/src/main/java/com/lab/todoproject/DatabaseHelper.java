@@ -183,34 +183,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return task;
     }
-    public ArrayList<Task> getCompletedTasks() {
-        ArrayList<Task> tasks = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-
-        try {
-            // Query for tasks where completed = 1 (i.e., completed tasks)
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_TASKS + " WHERE " + COLUMN_COMPLETED + " = 1", null);
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
-                    Task task = new Task(
-                            cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
-                            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)),
-                            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESC)),
-                            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DEADLINE)),
-                            cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMPLETED)) == 1
-                    );
-                    tasks.add(task);
-                } while (cursor.moveToNext());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-            db.close();
-        }
 
     public boolean editTask(int taskId, String name, String description, String deadline, boolean isCompleted) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -282,5 +254,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return false;
+    }
+
+    public ArrayList<Task> getCompletedTasks() {
+        ArrayList<Task> tasks = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            // Query for tasks where completed = 1 (i.e., completed tasks)
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_TASKS + " WHERE " + COLUMN_COMPLETED + " = 1", null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Task task = new Task(
+                            cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESC)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DEADLINE)),
+                            cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMPLETED)) == 1
+                    );
+                    tasks.add(task);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        return tasks;
     }
 }

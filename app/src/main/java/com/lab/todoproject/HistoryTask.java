@@ -9,44 +9,37 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 public class HistoryTask extends AppCompatActivity {
 
     private ListView lvCompletedTasks;
-    private TaskAdapter taskAdapter;
     private DatabaseHelper databaseHelper;
-    private ArrayList<Task> completedTaskList;
+    private HistoryTaskAdapter historyTaskAdapter;
+    private ArrayList<Task> completedTasks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_task);
 
-        // Initialize views and database helper
         lvCompletedTasks = findViewById(R.id.lv_completed_tasks);
         databaseHelper = new DatabaseHelper(this);
 
-        // Load completed tasks
-        loadCompletedTasks();
+        // Fetch completed tasks from the database
+        completedTasks = databaseHelper.getCompletedTasks();
 
-        // Set item click listener to view task details or edit
-        lvCompletedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Set the adapter
+        historyTaskAdapter = new HistoryTaskAdapter(this, completedTasks, databaseHelper);
+        lvCompletedTasks.setAdapter(historyTaskAdapter);
+        FloatingActionButton flt = findViewById(R.id.floatingActionButton);
+        flt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Task task = completedTaskList.get(position);
-                // Handle item click, you can show task details or edit
-                Toast.makeText(getApplicationContext(), "Task clicked: " + task.getName(), Toast.LENGTH_SHORT).show();
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), AddTask.class));
             }
         });
-    }
 
-    private void loadCompletedTasks() {
-        // Query the database for completed tasks
-        completedTaskList = databaseHelper.getCompletedTasks();
-
-        // Create adapter and set it to ListView
-        taskAdapter = new TaskAdapter(this, completedTaskList, databaseHelper);
-        lvCompletedTasks.setAdapter(taskAdapter);
     }
 }
