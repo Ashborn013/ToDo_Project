@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -105,6 +106,7 @@ public class AddTask extends AppCompatActivity {
             Toast.makeText(this, "Task Added", Toast.LENGTH_SHORT).show();
             finish();
         } else {
+            Log.d("AddTask", "Error Adding Task"+taskName+taskDesc+deadline);
             Toast.makeText(this, "Error Adding Task", Toast.LENGTH_SHORT).show();
         }
     }

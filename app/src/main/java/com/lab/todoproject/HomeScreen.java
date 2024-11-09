@@ -34,6 +34,7 @@ public class HomeScreen extends AppCompatActivity {
         lvTasks = findViewById(R.id.lv_tasks);
         databaseHelper = new DatabaseHelper(this);
         loadTasks();
+
         lvTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -41,6 +42,7 @@ public class HomeScreen extends AppCompatActivity {
                 markTaskAsComplete(task);
             }
         });
+
 
 
         FloatingActionButton fltb = findViewById(R.id.floatingActionButton2);
@@ -53,9 +55,27 @@ public class HomeScreen extends AppCompatActivity {
 
     }
     private void loadTasks() {
-        taskList = databaseHelper.getRemainingTasks();
-        taskAdapter = new TaskAdapter(this, taskList, databaseHelper);
-        lvTasks.setAdapter(taskAdapter);
+        try {
+            // Fetch remaining tasks from the database
+            taskList = databaseHelper.getRemainingTasks();
+
+            if (taskList == null) {
+                taskList = new ArrayList<>(); // Ensure taskList is not null
+            }
+
+            // Initialize adapter and set it to ListView
+            taskAdapter = new TaskAdapter(this, taskList, databaseHelper);
+            lvTasks.setAdapter(taskAdapter);
+
+            // Check if tasks loaded correctly
+            if (taskList.isEmpty()) {
+                Toast.makeText(this, "No remaining tasks to display", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            // Catch any exceptions and log for debugging
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
     private void markTaskAsComplete(Task task) {
         task.setCompleted(true);
