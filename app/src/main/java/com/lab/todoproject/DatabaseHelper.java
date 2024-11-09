@@ -34,6 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_DEADLINE + " TEXT, "
                 + COLUMN_COMPLETED + " INTEGER DEFAULT 0)";
         db.execSQL(createTable);
+        // Optional: Insert some sample data
 //        insertSampleData(db);
     }
 
@@ -61,7 +62,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_COMPLETED, 0);  // Task is not completed
         db.insert(TABLE_TASKS, null, values);
     }
-
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -95,7 +95,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return isInserted;
     }
 
-
     // Method to log current content of the database
     private void logDatabaseContent(SQLiteDatabase db) {
         Log.d("DatabaseContent", "Logging current database content");
@@ -123,7 +122,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
     }
-
 
     // Get Remaining Tasks
     public ArrayList<Task> getRemainingTasks() {
@@ -155,6 +153,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return tasks;
+    }
+
+    // Get Task by ID (for editing)
+    public Task getTaskById(int taskId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        Task task = null;
+
+        try {
+            cursor = db.query(TABLE_TASKS, null, COLUMN_ID + " = ?", new String[]{String.valueOf(taskId)}, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                task = new Task(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESC)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DEADLINE)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COMPLETED)) == 1
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        return task;
+    }
+    public boolean editTask(int taskId, String name, String description, String deadline, boolean isCompleted) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        // Set the new values for the task
+        values.put(COLUMN_NAME, name);
+        values.put(COLUMN_DESC, description);
+        values.put(COLUMN_DEADLINE, deadline);
+        values.put(COLUMN_COMPLETED, isCompleted ? 1 : 0);  // If completed, set to 1, else set to 0
+
+        boolean isUpdated = false;
+        try {
+            // Update the task where the task ID matches
+            isUpdated = db.update(TABLE_TASKS, values, COLUMN_ID + " = ?", new String[]{String.valueOf(taskId)}) > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
+        }
+
+        return isUpdated;
     }
 
     // Update Task (mark as completed)
@@ -206,4 +255,3 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 }
-

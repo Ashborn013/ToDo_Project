@@ -69,9 +69,9 @@ public class TaskAdapter extends BaseAdapter {
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(context, EditTaskActivity.class);
-//                intent.putExtra("TASK_ID", task.getId());
-//                context.startActivity(intent);
+                Intent intent = new Intent(context, EditTaskActivity.class);
+                intent.putExtra("TASK_ID", task.getId());
+                context.startActivity(intent);
 //
             }
         });
