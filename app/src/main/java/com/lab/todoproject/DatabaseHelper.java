@@ -4,7 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "tasks.db";
     private static final int DATABASE_VERSION = 1;
@@ -46,4 +50,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return result != -1;
     }
+    public ArrayList<Task> getRemainingTasks() {
+        ArrayList<Task> tasks = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM tasks WHERE completed = 0", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Task task = new Task(
+                        cursor.getInt(0), // id
+                        cursor.getString(1), // name
+                        cursor.getString(2), // description
+                        cursor.getString(3), // deadline
+                        cursor.getInt(4) == 1 // completed
+                );
+                tasks.add(task);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return tasks;
+    }
+    public boolean updateTask(Task task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("completed", task.isCompleted() ? 1 : 0);
+
+        return db.update("tasks", values, "id = ?", new String[]{String.valueOf(task.getId())}) > 0;
+    }
+    public boolean deleteTask(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("tasks", "id = ?", new String[]{String.valueOf(id)}) > 0;
+    }
+
 }
